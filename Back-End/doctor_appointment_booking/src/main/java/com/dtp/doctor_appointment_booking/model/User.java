@@ -1,5 +1,6 @@
 package com.dtp.doctor_appointment_booking.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -57,8 +58,16 @@ public class User {
     private LocalDate createdAt;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Appointment> appointments = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Feedback> feedbacks = new HashSet<>();
+
+    public User(String email, String password, String fullName) {
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+    }
 }
