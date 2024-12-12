@@ -22,7 +22,7 @@ public class Role {
 
     private String name;
 
-    @ManyToMany(mappedBy = "roles")
-    @JsonBackReference
-    private Set<User> user = new HashSet<>();
+//    @ManyToMany(mappedBy = "roles")
+//    @JsonBackReference
+//    private Set<User> user = new HashSet<>();
 }
