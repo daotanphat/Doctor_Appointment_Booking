@@ -4,11 +4,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Set;
 
+@Data
 public class SignupRequest {
 
     @NotBlank
@@ -26,36 +26,4 @@ public class SignupRequest {
     private String password;
 
     private Set<String> roles;
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setUsername(String username) {
-        this.fullName = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Set<String> getRoles() {
-        return this.roles;
-    }
-
-    public void setRole(Set<String> role) {
-        this.roles = role;
-    }
 }
