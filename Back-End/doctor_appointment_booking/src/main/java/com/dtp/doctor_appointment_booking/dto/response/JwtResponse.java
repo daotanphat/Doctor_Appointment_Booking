@@ -12,12 +12,14 @@ import java.util.List;
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
+    private String refreshToken;
     private int id;
     private String email;
     private List<String> roles;
 
-    public JwtResponse(String token, int id, String email, List<String> roles) {
-        this.token = token;
+    public JwtResponse(String accessToken, String refreshToken, int id, String email, List<String> roles) {
+        this.token = accessToken;
+        this.refreshToken = refreshToken;
         this.id = id;
         this.email = email;
         this.roles = roles;
