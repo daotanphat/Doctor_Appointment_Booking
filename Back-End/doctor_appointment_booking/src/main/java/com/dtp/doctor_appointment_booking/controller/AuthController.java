@@ -2,13 +2,18 @@ package com.dtp.doctor_appointment_booking.controller;
 
 import com.dtp.doctor_appointment_booking.dto.request.LoginRequest;
 import com.dtp.doctor_appointment_booking.dto.request.SignupRequest;
+import com.dtp.doctor_appointment_booking.dto.request.TokenRefreshRequest;
 import com.dtp.doctor_appointment_booking.dto.response.JwtResponse;
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
+import com.dtp.doctor_appointment_booking.dto.response.TokenRefreshResponse;
+import com.dtp.doctor_appointment_booking.exception.TokenRefreshException;
+import com.dtp.doctor_appointment_booking.model.RefreshToken;
 import com.dtp.doctor_appointment_booking.model.Role;
 import com.dtp.doctor_appointment_booking.model.User;
 import com.dtp.doctor_appointment_booking.repository.RoleRepository;
 import com.dtp.doctor_appointment_booking.repository.UserRepository;
 import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
+import com.dtp.doctor_appointment_booking.security.services.RefreshTokenService;
 import com.dtp.doctor_appointment_booking.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +48,9 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
@@ -98,20 +106,39 @@ public class AuthController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        String jwt = jwtUtils.generateJwtToken(userDetails);
+
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
         return ResponseEntity.ok(
                 new JwtResponse(
                         jwt,
+                        refreshToken.getToken(),
                         userDetails.getId(),
                         userDetails.getEmail(),
                         roles
                 )
         );
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtUtils.generateTokenFromUsername(user.getEmail());
+                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 }
