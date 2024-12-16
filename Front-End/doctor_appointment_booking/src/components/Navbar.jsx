@@ -10,15 +10,14 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   const successMessage = useSelector((state) => state.auth.message);
-
-  const jwt = localStorage.getItem('token');
+  const email = useSelector((state) => state.auth.user);
 
   const [showMenu, setShowMenu] = useState(false);
   const [token, setToken] = useState(true);
 
   const logoutHandler = async (event) => {
     try {
-      await dispatch(logout(jwt));
+      await dispatch(logout(email));
       toast.success(successMessage || 'Logout success!');
       setToken(false);
       navigate('/login');

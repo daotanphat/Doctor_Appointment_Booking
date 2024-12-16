@@ -30,6 +30,7 @@ export const authReducer = (state = initialState, action) => {
         case LOGIN_SUCCESS:
             return {
                 ...state,
+                user: action.payload.email,
                 isLoading: false,
                 jwt: action.payload.token,
                 refreshToken: action.payload.refreshToken,

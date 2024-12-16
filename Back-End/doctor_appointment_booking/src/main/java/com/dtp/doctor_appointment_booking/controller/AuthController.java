@@ -1,6 +1,7 @@
 package com.dtp.doctor_appointment_booking.controller;
 
 import com.dtp.doctor_appointment_booking.dto.request.LoginRequest;
+import com.dtp.doctor_appointment_booking.dto.request.LogoutRequest;
 import com.dtp.doctor_appointment_booking.dto.request.SignupRequest;
 import com.dtp.doctor_appointment_booking.dto.request.TokenRefreshRequest;
 import com.dtp.doctor_appointment_booking.dto.response.JwtResponse;
@@ -142,18 +143,12 @@ public class AuthController {
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-        Object principal = authentication.getPrincipal();
-
-        if (principal instanceof UserDetailsImpl) {
-            UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-            int userId = userDetails.getId();
-            refreshTokenService.deleteByUserId(userId);
-        }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Error: User is not found."));
+        int userId = user.getId();
+        refreshTokenService.deleteByUserId(userId);
         return ResponseEntity.ok(new MessageResponse("Logout successful!"));
     }
 }

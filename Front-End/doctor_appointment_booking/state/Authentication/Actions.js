@@ -1,6 +1,7 @@
 import axios from "axios";
 import { api, API_URL } from '../../config/Api'
 import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_FAILURE, LOGOUT_REQUEST, LOGOUT_SUCCESS, REFRESH_TOKEN_FAILURE, REFRESH_TOKEN_REQUEST, REFRESH_TOKEN_SUCCESS, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS } from "./ActionType";
+import storage from "redux-persist/lib/storage"
 
 export const registerUser = ({ requestData, navigate }) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST })
@@ -29,18 +30,13 @@ export const login = (requestData) => async (dispatch) => {
     }
 }
 
-export const logout = (token) => async (dispatch) => {
+export const logout = (email) => async (dispatch) => {
     dispatch({ type: LOGOUT_REQUEST })
     try {
-        const { data } = await api.get('/api/auth/logout', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        if (data !== null) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
-        }
+        const { data } = await api.post('/api/auth/logout', { email });
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        storage.removeItem('persist:root');
         dispatch({ type: LOGOUT_SUCCESS, payload: data })
     } catch (error) {
         const errorMessage = error.response?.data?.message || 'Logout failed. Please try again.';
