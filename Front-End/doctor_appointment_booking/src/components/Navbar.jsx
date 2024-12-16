@@ -1,12 +1,32 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { logout } from '../../state/Authentication/Actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const successMessage = useSelector((state) => state.auth.message);
+
+  const jwt = localStorage.getItem('token');
 
   const [showMenu, setShowMenu] = useState(false);
   const [token, setToken] = useState(true);
+
+  const logoutHandler = async (event) => {
+    try {
+      await dispatch(logout(jwt));
+      toast.success(successMessage || 'Logout success!');
+      setToken(false);
+      navigate('/login');
+    } catch (error) {
+      // Assuming the error is set in the Redux state
+      console.log(error);
+    }
+  }
 
   return (
     <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400'>
@@ -39,7 +59,7 @@ const Navbar = () => {
                 <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
                   <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>My Profile</p>
                   <p onClick={() => navigate('/my-appointments')} className='hover:text-black cursor-pointer'>My Appointment</p>
-                  <p onClick={() => setToken(false)} className='hover:text-black cursor-pointer'>Logout</p>
+                  <p onClick={logoutHandler} className='hover:text-black cursor-pointer'>Logout</p>
                 </div>
               </div>
             </div>

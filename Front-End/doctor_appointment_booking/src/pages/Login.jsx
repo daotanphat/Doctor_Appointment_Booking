@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../../state/Authentication/Actions';
+import { login, registerUser } from '../../state/Authentication/Actions';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const errorMessage = useSelector((state) => state.auth.error);
   const successMessage = useSelector((state) => state.auth.message);
+  const roles = useSelector((state) => state.auth.roles);
 
   const [state, setState] = useState('Sign Up');
 
@@ -52,27 +54,50 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (validateForm()) {
+    if (state === 'Sign up') {
+      if (validateForm()) {
+        const formData = {
+          fullName: name,
+          email: email,
+          password: password,
+        };
+        setErrors({}); // Clear errors after successful submission
+
+        try {
+          await dispatch(registerUser({ requestData: formData, navigate: navigate }));
+          if (successMessage) {
+            toast.success(successMessage || 'Registered successfully!');
+            setState('Login');
+            // Clear the input fields
+            setName('');
+            setEmail('');
+            setPassword('');
+          }
+        } catch (error) {
+          // Assuming the error is set in the Redux state
+          setErrors({ email: error.message }); // Set the error message for email
+        }
+      }
+    } else {
       const formData = {
-        fullName: name,
         email: email,
         password: password,
       };
-      setErrors({}); // Clear errors after successful submission
 
       try {
-        await dispatch(registerUser({ requestData: formData, navigate: navigate }));
-        if (successMessage) {
-          toast.success(successMessage || 'Registered successfully!')
-          setState('Login');
-          // Clear the input fields
-          setName('');
-          setEmail('');
-          setPassword('');
+        await dispatch(login(formData));
+        toast.success('Login successfully!');
+
+        if (roles.includes('USER')) {
+          console.log("USER role");
+          navigate('/');
         }
+
+        setEmail('');
+        setPassword('');
       } catch (error) {
         // Assuming the error is set in the Redux state
-        setErrors({ email: error.message }); // Set the error message for email
+        console.log(error);
       }
     }
   }
