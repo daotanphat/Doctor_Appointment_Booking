@@ -1,0 +1,45 @@
+import { ADD_SPECIALITY_FAILURE, ADD_SPECIALITY_REQUEST, ADD_SPECIALITY_SUCCESS, REFRESH_ERROR, REFRESH_MESSAGE } from './ActionTypes'
+
+const initialState = {
+    specialities: [],
+    isLoading: null,
+    error: null,
+    message: null
+}
+
+export const specialityReducer = (state = initialState, action) => {
+    switch (action.type) {
+        case ADD_SPECIALITY_REQUEST:
+            return {
+                ...state,
+                isLoading: true,
+                error: null
+            }
+        case ADD_SPECIALITY_SUCCESS:
+            return {
+                ...state,
+                isLoading: false,
+                message: action.payload.message,
+                error: null
+            }
+        case ADD_SPECIALITY_FAILURE:
+            return {
+                ...state,
+                isLoading: false,
+                error: action.payload,
+                message: null
+            }
+        case REFRESH_MESSAGE:
+            return {
+                ...state,
+                message: null
+            }
+        case REFRESH_ERROR:
+            return {
+                ...state,
+                error: null
+            }
+        default:
+            return state;
+    }
+}
