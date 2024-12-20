@@ -1,11 +1,13 @@
 import { applyMiddleware, combineReducers, legacy_createStore } from "redux";
-import { specialityReducer } from './Speciality/Reducer';
+import { specialityReducer } from './speciality/Reducer';
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { thunk } from "redux-thunk";
+import { doctorReducer } from "./doctor/Reducer";
 
 const rooteReducer = combineReducers({
-    speciality: specialityReducer
+    speciality: specialityReducer,
+    doctor: doctorReducer
 })
 
 const rootReducer = (state, action) => {
