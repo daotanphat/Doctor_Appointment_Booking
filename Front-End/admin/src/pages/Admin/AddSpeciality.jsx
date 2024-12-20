@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { assets } from '../../assets/assets';
 import { toast } from 'react-toastify';
-import { addSpecialty, refreshError, refreshMessage } from '../../State/Speciality/Actions';
+import { addSpecialty, refreshError, refreshMessage } from '../../state/speciality/Actions';
 import { useDispatch, useSelector } from 'react-redux';
 
 const AddSpeciality = () => {

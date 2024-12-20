@@ -1,5 +1,6 @@
 package com.dtp.doctor_appointment_booking.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class Speciality {
     private String imageUrl;
 
     @OneToMany(mappedBy = "speciality", cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Doctor> doctors = new HashSet<>();
 }
