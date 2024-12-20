@@ -1,6 +1,7 @@
 package com.dtp.doctor_appointment_booking.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public class Doctor {
     private String degree;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonManagedReference
     @JoinColumn(name = "speciality_id", nullable = false)
     private Speciality speciality;
 
