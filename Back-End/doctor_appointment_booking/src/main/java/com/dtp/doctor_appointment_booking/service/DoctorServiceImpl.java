@@ -1,11 +1,15 @@
 package com.dtp.doctor_appointment_booking.service;
 
 import com.dtp.doctor_appointment_booking.dto.request.AddDoctorRequest;
+import com.dtp.doctor_appointment_booking.dto.response.DoctorResponse;
 import com.dtp.doctor_appointment_booking.exception.IllegalArgumentException;
 import com.dtp.doctor_appointment_booking.mapper.DoctorMapper;
 import com.dtp.doctor_appointment_booking.model.Doctor;
 import com.dtp.doctor_appointment_booking.repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,5 +51,12 @@ public class DoctorServiceImpl implements DoctorService {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Override
+    public Page<DoctorResponse> getDoctorsAvailable(String search, String speciality, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DoctorResponse> doctors = doctorRepository.getDoctorByPageAndFilter(search, speciality, pageable);
+        return doctors;
     }
 }
