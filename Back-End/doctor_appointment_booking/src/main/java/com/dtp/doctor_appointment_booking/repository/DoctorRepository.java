@@ -23,7 +23,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
             " OR LOWER(d.fullName) LIKE LOWER(CONCAT('%', :search))" +
             " OR LOWER(d.speciality.name) LIKE LOWER(CONCAT('%', :search))" +
             " OR LOWER(d.phone) LIKE LOWER(CONCAT('%', :search)))" +
-            " AND (:speciality IS NULL OR d.speciality.name = :speciality)")
+            " AND (:speciality IS NULL OR d.speciality.name = :speciality)" +
+            " AND d.status = true")
     Page<DoctorResponse> getDoctorByPageAndFilter(@Param("search") String search,
                                                   @Param("speciality") String speciality,
                                                   Pageable pageable);
