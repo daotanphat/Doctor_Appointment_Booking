@@ -36,7 +36,6 @@ public class AdminController {
     @PostMapping("/add-doctor")
     public ResponseEntity<MessageResponse> addDoctor(@RequestPart AddDoctorRequest doctor,
                                                      @RequestPart("image") MultipartFile image) throws JsonProcessingException {
-        AddDoctorRequest addDoctorRequest = doctor;
         doctorService.saveDoctor(doctor, image);
         MessageResponse messageResponse = new MessageResponse("Doctor added successfully");
 
