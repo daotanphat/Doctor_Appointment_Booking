@@ -2,6 +2,7 @@ package com.dtp.doctor_appointment_booking.service;
 
 import com.dtp.doctor_appointment_booking.dto.request.AddDoctorRequest;
 import com.dtp.doctor_appointment_booking.dto.response.DoctorResponse;
+import com.dtp.doctor_appointment_booking.exception.EntityNotFoundException;
 import com.dtp.doctor_appointment_booking.exception.IllegalArgumentException;
 import com.dtp.doctor_appointment_booking.mapper.DoctorMapper;
 import com.dtp.doctor_appointment_booking.model.Doctor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -54,9 +56,24 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    public DoctorResponse getDoctorById(String id) {
+        Optional<Doctor> doctor = doctorRepository.findByDoctor_id(id);
+        if (doctor.isPresent()) {
+            DoctorResponse response = DoctorMapper.INSTANCE.entityToResponse(doctor.get());
+            return response;
+        }
+        throw new EntityNotFoundException(Doctor.class);
+    }
+
+    @Override
     public Page<DoctorResponse> getDoctorsAvailable(String search, String speciality, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<DoctorResponse> doctors = doctorRepository.getDoctorByPageAndFilter(search, speciality, pageable);
         return doctors;
+    }
+
+    @Override
+    public List<DoctorResponse> getDoctorBySpeciality(String speciality) {
+        return doctorRepository.getDoctorBySpecialityName(speciality);
     }
 }

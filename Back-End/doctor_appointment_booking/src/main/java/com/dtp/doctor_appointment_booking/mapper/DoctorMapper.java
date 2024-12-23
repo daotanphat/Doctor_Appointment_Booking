@@ -1,14 +1,11 @@
 package com.dtp.doctor_appointment_booking.mapper;
 
 import com.dtp.doctor_appointment_booking.dto.request.AddDoctorRequest;
+import com.dtp.doctor_appointment_booking.dto.response.DoctorResponse;
 import com.dtp.doctor_appointment_booking.model.Doctor;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Mapper
 public interface DoctorMapper {
@@ -22,4 +19,9 @@ public interface DoctorMapper {
     @Mapping(target = "description", source = "about")
     @Mapping(target = "status", constant = "true")
     Doctor addRequestToEntity(AddDoctorRequest request);
+
+    @Mapping(target = "doctorId", source = "doctor_id")
+    @Mapping(target = "name", source = "fullName")
+    @Mapping(target = "speciality", source = "speciality.name")
+    DoctorResponse entityToResponse(Doctor doctor);
 }

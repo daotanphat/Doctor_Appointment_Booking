@@ -8,10 +8,7 @@ import com.dtp.doctor_appointment_booking.service.SpecialityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,5 +39,17 @@ public class UserController {
     @GetMapping("/specialities")
     public ResponseEntity<List<Speciality>> getSpecialities() {
         return ResponseEntity.ok(specialityService.getAllSpecialities());
+    }
+
+    @GetMapping("doctor/{id}")
+    public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable String id) {
+        DoctorResponse doctor = doctorService.getDoctorById(id);
+        return ResponseEntity.ok(doctor);
+    }
+
+    @GetMapping("/doctor/speciality/{speciality}")
+    public ResponseEntity<List<DoctorResponse>> getDoctorBySpeciality(@PathVariable String speciality) {
+        List<DoctorResponse> doctors = doctorService.getDoctorBySpeciality(speciality);
+        return ResponseEntity.ok(doctors);
     }
 }

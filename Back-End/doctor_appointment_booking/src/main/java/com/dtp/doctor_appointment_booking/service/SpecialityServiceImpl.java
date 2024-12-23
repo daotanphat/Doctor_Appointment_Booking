@@ -48,12 +48,4 @@ public class SpecialityServiceImpl implements SpecialityService {
     public List<Speciality> getAllSpecialities() {
         return specialityRepository.findAll();
     }
-
-    static Speciality unwrapSpeciality(Optional<Speciality> entity, int id) {
-        if (entity.isPresent()) {
-            return entity.get();
-        } else {
-            throw new EntityNotFoundException(Speciality.class, id);
-        }
-    }
 }

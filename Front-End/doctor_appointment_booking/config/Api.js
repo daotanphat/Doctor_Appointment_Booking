@@ -1,6 +1,6 @@
 import axios from "axios";
 import { logout, refreshTokenRequest } from "../state/Authentication/Actions";
-import { useSelector } from "react-redux";
+import { store } from '../state/Store';
 
 export const API_URL = 'http://localhost:8080';
 
@@ -15,8 +15,9 @@ export const api = axios.create({
 api.interceptors.request.use(
     (config) => {
 
-        if (!config.url.includes('/api/auth/')) {
-            const accessToken = useSelector((state) => state.auth.accessToken); // Access token from Redux store
+        if (!config.url.includes('/api/auth/') && !config.url.includes('/api/user/')) {
+            const state = store.getState(); // Access the entire Redux store state
+            const accessToken = state.auth.accessToken;
             console.log(accessToken + ' token - api.jsx');
 
             if (accessToken) {

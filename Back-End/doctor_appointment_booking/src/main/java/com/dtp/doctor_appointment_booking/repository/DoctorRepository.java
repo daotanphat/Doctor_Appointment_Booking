@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,4 +29,16 @@ public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
     Page<DoctorResponse> getDoctorByPageAndFilter(@Param("search") String search,
                                                   @Param("speciality") String speciality,
                                                   Pageable pageable);
+
+    @Query("SELECT d FROM Doctor d" +
+            " WHERE d.doctor_id = :doctorId")
+    Optional<Doctor> findByDoctor_id(@Param("doctorId") String doctorId);
+
+    @Query("SELECT new com.dtp.doctor_appointment_booking.dto.response.DoctorResponse(d.doctor_id, d.fullName, d.email, " +
+            " d.dateOfBirth, d.phone, d.address, d.gender, d.imageUrl, d.status, d.experience, d.degree, d.speciality.name, " +
+            " d.fee, d.description, d.bankNumber, d.rating) " +
+            " FROM Doctor d " +
+            " WHERE d.speciality.name = :speciality" +
+            " AND d.status = true")
+    List<DoctorResponse> getDoctorBySpecialityName(@Param("speciality") String speciality);
 }
