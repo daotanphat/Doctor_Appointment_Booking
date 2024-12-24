@@ -89,7 +89,7 @@ const Appointment = () => {
           </p>
           <div className='flex items-center gap-2 text-sm mt-1 text-gray-600'>
             <p>{doctor.degree} - {doctor.speciality}</p>
-            <button className='py-0.5 px-2 border text-xs rounded-full'>{doctor.experience}</button>
+            <button className='py-0.5 px-2 border text-xs rounded-full'>{doctor.experience} Year</button>
           </div>
 
           {/* ----- Doctor About ----- */}

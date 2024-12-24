@@ -14,9 +14,16 @@ const RelatedDoctors = ({ docId, speciality }) => {
 
     useEffect(() => {
         dispatch(getDoctorBySpeciality(speciality));
-        const doctorsData = doctors.filter((doc) => doc.doctorId !== docId);
-        setRelDocs(doctorsData);
     }, [speciality, docId])
+
+    // Effect to update relDocs when doctors list from store changes
+    useEffect(() => {
+        if (doctors.length > 0) {
+            // Filter doctors to exclude the current one
+            const doctorsData = doctors.filter((doc) => doc.doctorId !== docId);
+            setRelDocs(doctorsData);
+        }
+    }, [doctors, docId]);
 
     return (
         <div className='flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10'>
