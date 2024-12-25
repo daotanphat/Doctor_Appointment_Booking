@@ -5,11 +5,13 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { doctorReducer } from "./doctor/Reducer";
 import { specialityReducer } from './speciality/Reducer';
+import { userReducer } from "./user/Reducer";
 
 const rooteReducer = combineReducers({
     auth: authReducer,
     speciality: specialityReducer,
-    doctor: doctorReducer
+    doctor: doctorReducer,
+    user: userReducer
 })
 
 const rootReducer = (state, action) => {
@@ -22,7 +24,7 @@ const rootReducer = (state, action) => {
 const persitConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth', 'speciality', 'doctor']
+    whitelist: ['auth', 'speciality', 'doctor', 'user']
 }
 
 const persitedReducer = persistReducer(persitConfig, rootReducer);
