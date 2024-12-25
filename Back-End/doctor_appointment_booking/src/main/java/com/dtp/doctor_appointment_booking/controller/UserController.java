@@ -1,14 +1,21 @@
 package com.dtp.doctor_appointment_booking.controller;
 
+import com.dtp.doctor_appointment_booking.dto.request.UpdateUserRequest;
 import com.dtp.doctor_appointment_booking.dto.response.DoctorResponse;
+import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
 import com.dtp.doctor_appointment_booking.dto.response.PageResponse;
+import com.dtp.doctor_appointment_booking.dto.response.UserResponse;
 import com.dtp.doctor_appointment_booking.model.Speciality;
+import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
 import com.dtp.doctor_appointment_booking.service.DoctorService;
 import com.dtp.doctor_appointment_booking.service.SpecialityService;
+import com.dtp.doctor_appointment_booking.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,10 +23,16 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
     @Autowired
-    DoctorService doctorService;
+    private DoctorService doctorService;
 
     @Autowired
-    SpecialityService specialityService;
+    private SpecialityService specialityService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @GetMapping("/doctor-list")
     public ResponseEntity<?> getDoctorsAvailable(
@@ -51,5 +64,20 @@ public class UserController {
     public ResponseEntity<List<DoctorResponse>> getDoctorBySpeciality(@PathVariable String speciality) {
         List<DoctorResponse> doctors = doctorService.getDoctorBySpeciality(speciality);
         return ResponseEntity.ok(doctors);
+    }
+
+    @GetMapping("/my-info")
+    public ResponseEntity<UserResponse> getUserInfo(@RequestHeader("Authorization") String token) {
+        token = token.replace("Bearer ", "");
+        String email = jwtUtils.getUserNameFromJwtToken(token);
+        return ResponseEntity.ok(userService.getUserInfo(email));
+    }
+
+    @PostMapping("/update-info")
+    public ResponseEntity<MessageResponse> updateUserInfo(@Valid @RequestPart UpdateUserRequest request,
+                                                          @RequestPart("image") MultipartFile image) {
+        userService.updateUserInfo(request, image);
+        MessageResponse messageResponse = new MessageResponse("User info updated successfully");
+        return ResponseEntity.ok(messageResponse);
     }
 }
