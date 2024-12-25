@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { login, registerUser } from '../../state/Authentication/Actions';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,26 @@ const Login = () => {
     email: '',
     password: '',
   });
+
+  // Monitor errorMessage, successMessage, and roles changes
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+
+    if (successMessage) {
+      toast.success(successMessage);
+      // Clear the input fields
+      setName('');
+      setEmail('');
+      setPassword('');
+    }
+
+    // If user has a valid role, navigate to the appropriate page
+    if (roles && roles.includes('USER')) {
+      navigate('/');
+    }
+  }, [errorMessage, successMessage, roles, navigate]);
 
   const validateForm = () => {
     const nameRegex = /^[a-zA-Z\s]+$/; // Only alphabets and spaces
@@ -68,10 +88,6 @@ const Login = () => {
           if (successMessage) {
             toast.success(successMessage || 'Registered successfully!');
             setState('Login');
-            // Clear the input fields
-            setName('');
-            setEmail('');
-            setPassword('');
           }
         } catch (error) {
           // Assuming the error is set in the Redux state
@@ -86,15 +102,6 @@ const Login = () => {
 
       try {
         await dispatch(login(formData));
-        toast.success('Login successfully!');
-
-        if (roles.includes('USER')) {
-          console.log("USER role");
-          navigate('/');
-        }
-
-        setEmail('');
-        setPassword('');
       } catch (error) {
         // Assuming the error is set in the Redux state
         console.log(error);
@@ -106,6 +113,9 @@ const Login = () => {
     <form className='min-h-[80vh] flex items-center'>
       <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
         <p className='text-2xl font-semibold'>{state === 'Sign Up' ? 'Create Account' : 'Login'}</p>
+        {errorMessage && ( // Display the error message from the backend
+          <p className="text-red-500 text-xs mt-1">{errorMessage}</p>
+        )}
         <p>Please {state === 'Sign Up' ? 'sign up' : 'login'} to book appointment</p>
         {
           state === 'Sign Up' &&
@@ -122,9 +132,6 @@ const Login = () => {
           <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="email" onChange={(e) => setEmail(e.target.value)} value={email} required />
           {errors.email && (
             <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-          )}
-          {errorMessage && ( // Display the error message from the backend
-            <p className="text-red-500 text-xs mt-1">{errorMessage}</p>
           )}
         </div>
         <div className='w-full'>
