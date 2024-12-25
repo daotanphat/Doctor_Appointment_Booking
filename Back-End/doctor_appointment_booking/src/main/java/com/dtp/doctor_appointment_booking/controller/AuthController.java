@@ -7,6 +7,7 @@ import com.dtp.doctor_appointment_booking.dto.request.TokenRefreshRequest;
 import com.dtp.doctor_appointment_booking.dto.response.JwtResponse;
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
 import com.dtp.doctor_appointment_booking.dto.response.TokenRefreshResponse;
+import com.dtp.doctor_appointment_booking.exception.EntityNotFoundException;
 import com.dtp.doctor_appointment_booking.exception.TokenRefreshException;
 import com.dtp.doctor_appointment_booking.model.RefreshToken;
 import com.dtp.doctor_appointment_booking.model.Role;
@@ -146,7 +147,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Error: User is not found."));
+                .orElseThrow(() -> new EntityNotFoundException(User.class));
         int userId = user.getId();
         refreshTokenService.deleteByUserId(userId);
         return ResponseEntity.ok(new MessageResponse("Logout successful!"));
