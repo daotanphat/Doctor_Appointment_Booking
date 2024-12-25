@@ -74,9 +74,9 @@ public class UserController {
     }
 
     @PostMapping("/update-info")
-    public ResponseEntity<MessageResponse> updateUserInfo(@Valid @RequestPart UpdateUserRequest request,
-                                                          @RequestPart("image") MultipartFile image) {
-        userService.updateUserInfo(request, image);
+    public ResponseEntity<MessageResponse> updateUserInfo(@Valid @RequestPart UpdateUserRequest user,
+                                                          @RequestPart(value = "image", required = false) MultipartFile image) {
+        userService.updateUserInfo(user, image);
         MessageResponse messageResponse = new MessageResponse("User info updated successfully");
         return ResponseEntity.ok(messageResponse);
     }

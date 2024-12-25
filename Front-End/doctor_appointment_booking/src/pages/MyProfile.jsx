@@ -17,6 +17,7 @@ const MyProfile = () => {
   const [userData, setUserData] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [userImg, setUserImg] = useState(null);
+  const [email, setEmail] = useState(user?.email);
   const [name, setName] = useState(user?.fullName);
   const [dob, setDob] = useState(user?.dateOfBirth == null ? '' : user.dateOfBirth);
   const [address, setAddress] = useState(user?.address == null ? '' : user.address);
@@ -132,13 +133,14 @@ const MyProfile = () => {
       // Prepare FormData
       const formData = new FormData();
       const userData = {
+        email: email,
         fullName: name,
         dateOfBirth: dob,
         phone: phone,
         address: address,
         gender: gender
       };
-      formData.append('doctor', new Blob([JSON
+      formData.append('user', new Blob([JSON
         .stringify(userData)], {
         type: 'application/json'
       }));
@@ -149,7 +151,7 @@ const MyProfile = () => {
       })
       console.log(userData);
 
-      dispatch(updateUserInfo(formData));
+      dispatch(updateUserInfo(formData, token));
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update user info');
       console.log(error);
@@ -217,7 +219,7 @@ const MyProfile = () => {
                   <option value='true'>Male</option>
                   <option value='false'>Female</option>
                 </select>
-                : <p className='text-gray-400'>{userData?.gender}</p>
+                : <p className='text-gray-400'>{userData?.gender ? 'Male' : 'Female'}</p>
             }{errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
           </div>
           <p className='font-medium'>Birthday</p>

@@ -23,4 +23,12 @@ public class EndPointService {
             "/api/user/doctor/{id}",
             "/api/user/doctor/speciality/{speciality}"
     };
+
+    public static final String[] userGetEndPointAuth = {
+            "/api/user/my-info"
+    };
+
+    public static final String[] userPostEndPointAuth = {
+            "/api/user/update-info"
+    };
 }

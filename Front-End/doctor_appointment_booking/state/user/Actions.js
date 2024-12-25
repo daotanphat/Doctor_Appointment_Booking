@@ -12,13 +12,16 @@ export const getUserInfo = () => async (dispatch) => {
     }
 }
 
-export const updateUserInfo = (formData) => async (dispatch) => {
+export const updateUserInfo = (formData, token) => async (dispatch) => {
     dispatch({ type: UPDATE_USER_INFO_REQUEST })
     try {
         console.log('hallo');
 
         const { data } = await api.post('/api/user/update-info', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            },
         });
         console.log(data);
 
