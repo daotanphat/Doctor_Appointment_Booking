@@ -75,4 +75,7 @@ public class Doctor {
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
     private Set<Feedback> feedbacks = new HashSet<>();
+
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
+    private Set<DoctorBusy> doctorBusies = new HashSet<>();
 }

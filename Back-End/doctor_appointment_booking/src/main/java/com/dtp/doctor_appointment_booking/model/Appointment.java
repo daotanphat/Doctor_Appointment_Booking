@@ -38,7 +38,9 @@ public class Appointment {
 
     private LocalDate dateSlot;
 
-    private String timeSlot;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_slot_id", nullable = false)
+    private TimeSlot timeSlot;
 
     private String address;
 
