@@ -23,8 +23,5 @@ public class TimeSlot {
     private LocalTime time;
 
     @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL)
-    private Set<Appointment> appointments = new HashSet<>();
-
-    @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL)
     private Set<DoctorBusy> doctorBusies = new HashSet<>();
 }
