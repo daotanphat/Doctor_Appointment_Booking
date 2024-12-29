@@ -38,6 +38,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(messageResponse);
     }
 
+    @ExceptionHandler({SlotUnavailableException.class})
+    public ResponseEntity<MessageResponse> handleSlotUnavailableException(SlotUnavailableException exception) {
+        MessageResponse messageResponse = new MessageResponse();
+        messageResponse.setMessage(exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(messageResponse);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<String> errors = ex.getBindingResult()
