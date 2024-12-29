@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Data
@@ -21,7 +19,4 @@ public class TimeSlot {
     private int id;
 
     private LocalTime time;
-
-    @OneToMany(mappedBy = "timeSlot", cascade = CascadeType.ALL)
-    private Set<DoctorBusy> doctorBusies = new HashSet<>();
 }
