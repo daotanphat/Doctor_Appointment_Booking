@@ -47,6 +47,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(messageResponse);
     }
 
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<MessageResponse> handleException(Exception exception) {
+        MessageResponse messageResponse = new MessageResponse();
+        messageResponse.setMessage(exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(messageResponse);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<String> errors = ex.getBindingResult()

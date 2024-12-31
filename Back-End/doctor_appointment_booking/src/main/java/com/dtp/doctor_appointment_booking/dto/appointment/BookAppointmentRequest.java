@@ -1,6 +1,5 @@
-package com.dtp.doctor_appointment_booking.dto.request;
+package com.dtp.doctor_appointment_booking.dto.appointment;
 
-import com.dtp.doctor_appointment_booking.model.TimeSlot;
 import com.dtp.doctor_appointment_booking.validation.ValidTimeSlotOrder;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -24,7 +23,6 @@ public class BookAppointmentRequest {
     @Positive(message = "Fee must be larger than 0")
     private float fee;
 
-    @NotBlank(message = "Date can not be null")
     @FutureOrPresent(message = "Date can not be in the past")
     private LocalDate dateSlot;
 
