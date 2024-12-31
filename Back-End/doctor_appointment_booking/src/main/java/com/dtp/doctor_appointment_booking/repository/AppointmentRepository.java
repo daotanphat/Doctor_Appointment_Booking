@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
     @Query("SELECT a FROM Appointment a" +
@@ -19,4 +21,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     Page<Appointment> findAllByPatientEmail(@Param("email") String email,
                                             @Param("search") String search,
                                             Pageable pageable);
+
+    @Query("SELECT a FROM Appointment a" +
+            " WHERE a.appointment_id = :appointmentId")
+    Optional<Appointment> findByAppointment_id(String appointmentId);
 }

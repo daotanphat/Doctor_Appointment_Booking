@@ -27,13 +27,16 @@ public class AppointmentController {
     private final JwtUtils jwtUtils;
     private final AppointmentStatusRepository appointmentStatusRepository;
     private final AppointmentRepository appointmentRepository;
+    private final AppointmentMapper appointmentMapper;
 
     public AppointmentController(AppointmentService appointmentService, JwtUtils jwtUtils,
-                                 AppointmentStatusRepository appointmentStatusRepository, AppointmentRepository appointmentRepository) {
+                                 AppointmentStatusRepository appointmentStatusRepository, AppointmentRepository appointmentRepository,
+                                 AppointmentMapper appointmentMapper) {
         this.appointmentService = appointmentService;
         this.jwtUtils = jwtUtils;
         this.appointmentStatusRepository = appointmentStatusRepository;
         this.appointmentRepository = appointmentRepository;
+        this.appointmentMapper = appointmentMapper;
     }
 
     @PostMapping("/book")
@@ -77,6 +80,22 @@ public class AppointmentController {
             appointmentResponses.add(response);
         }
         PageResponse<AppointmentResponse> response = new PageResponse<>(appointmentResponses, appointmentsPage.getTotalPages());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/cancel/{appointmentId}")
+    public ResponseEntity<MessageResponse> cancelAppointment(@PathVariable("appointmentId") String appointmentId) {
+        Appointment appointment = appointmentService.cancelAppointment(appointmentId);
+        if (appointment == null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("There is error when cancelling appointment. Please try again later!"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Appointment cancelled successfully"));
+    }
+
+    @GetMapping("/{appointmentId}/details")
+    public ResponseEntity<AppointmentResponse> getAppointmentDetails(@PathVariable("appointmentId") String appointmentId) {
+        Appointment appointment = appointmentService.getAppointment(appointmentId);
+        AppointmentResponse response = appointmentMapper.entityToResponse(appointment);
         return ResponseEntity.ok(response);
     }
 }

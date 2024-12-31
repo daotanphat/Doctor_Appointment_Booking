@@ -30,11 +30,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final TimeSlotRepository timeSlotRepository;
     private final DoctorRepository doctorRepository;
     private final UserRepository userRepository;
+    private final AppointmentMapper appointmentMapper;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, StatusRepository statusRepository,
                                   AppointmentStatusRepository appointmentStatusRepository, DoctorBusyRepository doctorBusyRepository,
                                   TimeSlotRepository timeSlotRepository, DoctorRepository doctorRepository,
-                                  UserRepository userRepository) {
+                                  UserRepository userRepository, AppointmentMapper appointmentMapper) {
         this.appointmentRepository = appointmentRepository;
         this.statusRepository = statusRepository;
         this.appointmentStatusRepository = appointmentStatusRepository;
@@ -42,6 +43,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.timeSlotRepository = timeSlotRepository;
         this.doctorRepository = doctorRepository;
         this.userRepository = userRepository;
+        this.appointmentMapper = appointmentMapper;
     }
 
     @Transactional
@@ -58,22 +60,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         User user = userRepository.findByEmail(request.getPatient_mail())
                 .orElseThrow(() -> new EntityNotFoundException(User.class));
 
-        Appointment appointment = AppointmentMapper.INSTANCE.bookRequestToEntity(request);
+        Appointment appointment = appointmentMapper.bookRequestToEntity(request);
         appointment.setDoctor(doctor);
         appointment.setPatient(user);
         appointment.setPaymentStatus("PENDING");
         appointmentRepository.save(appointment); // save appointment
 
-        // set status of appointment
-        Status status = statusRepository.findByStatus("BOOKED");
-        AppointmentStatus appointmentStatus = new AppointmentStatus();
-        AppointmentStatusKey appointmentStatusKey = new AppointmentStatusKey();
-        appointmentStatusKey.setAppointmentId(appointment.getId());
-        appointmentStatusKey.setStatusId(status.getId());
-        appointmentStatus.setId(appointmentStatusKey);
-        appointmentStatus.setAppointment(appointment);
-        appointmentStatus.setStatus(status);
-        appointmentStatusRepository.save(appointmentStatus);
+        // add status to appointment status
+        AppointmentStatus appointmentStatus = addAppointmentStatus(appointment.getAppointment_id(), "BOOKED");
 
         return appointment;
     }
@@ -83,6 +77,42 @@ public class AppointmentServiceImpl implements AppointmentService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Appointment> appointments = appointmentRepository.findAllByPatientEmail(email, search, pageable);
         return appointments;
+    }
+
+    @Override
+    @Transactional
+    public Appointment cancelAppointment(String appointmentId) {
+        AppointmentStatus appointmentStatus = addAppointmentStatus(appointmentId, "CANCEL");
+
+        // change status of payment to cancelled
+        Appointment appointment = appointmentStatus.getAppointment();
+        appointment.setPaymentStatus("CANCELLED");
+        appointmentRepository.save(appointment);
+
+        return appointment;
+    }
+
+    @Override
+    public Appointment getAppointment(String appointmentId) {
+        Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException(Appointment.class));
+        return appointment;
+    }
+
+    public AppointmentStatus addAppointmentStatus(String appointmentId, String status) {
+        Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException(Appointment.class));
+
+        Status statusObject = statusRepository.findByStatus(status);
+
+        AppointmentStatus appointmentStatus = new AppointmentStatus();
+        AppointmentStatusKey appointmentStatusKey = new AppointmentStatusKey();
+        appointmentStatusKey.setAppointmentId(appointment.getId());
+        appointmentStatusKey.setStatusId(statusObject.getId());
+        appointmentStatus.setId(appointmentStatusKey);
+        appointmentStatus.setAppointment(appointment);
+        appointmentStatus.setStatus(statusObject);
+        return appointmentStatusRepository.save(appointmentStatus);
     }
 
     public boolean isTimeSlotAvailable(String doctorId, LocalDate date, int timeSlotFrom, int timeSlotTo) {

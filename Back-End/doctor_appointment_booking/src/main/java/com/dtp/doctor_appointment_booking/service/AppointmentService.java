@@ -8,4 +8,8 @@ public interface AppointmentService {
     Appointment bookAppointment(BookAppointmentRequest request);
 
     Page<Appointment> getMyAppointments(String email, String search, int page, int size);
+
+    Appointment cancelAppointment(String appointmentId);
+
+    Appointment getAppointment(String appointmentId);
 }
