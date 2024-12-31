@@ -1,6 +1,6 @@
 package com.dtp.doctor_appointment_booking.validation;
 
-import com.dtp.doctor_appointment_booking.dto.request.BookAppointmentRequest;
+import com.dtp.doctor_appointment_booking.dto.appointment.BookAppointmentRequest;
 import com.dtp.doctor_appointment_booking.model.TimeSlot;
 import com.dtp.doctor_appointment_booking.repository.TimeSlotRepository;
 import jakarta.validation.ConstraintValidator;
