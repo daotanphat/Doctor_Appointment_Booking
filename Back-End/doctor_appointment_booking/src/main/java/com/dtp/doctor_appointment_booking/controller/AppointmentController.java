@@ -1,23 +1,33 @@
 package com.dtp.doctor_appointment_booking.controller;
 
+import com.dtp.doctor_appointment_booking.config.VnPayConfig;
 import com.dtp.doctor_appointment_booking.dto.appointment.AppointmentResponse;
 import com.dtp.doctor_appointment_booking.dto.appointment.BookAppointmentRequest;
+import com.dtp.doctor_appointment_booking.dto.payment.PaymentResponse;
+import com.dtp.doctor_appointment_booking.dto.payment.PaymentStatusResponse;
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
 import com.dtp.doctor_appointment_booking.dto.response.PageResponse;
 import com.dtp.doctor_appointment_booking.mapper.AppointmentMapper;
 import com.dtp.doctor_appointment_booking.model.Appointment;
 import com.dtp.doctor_appointment_booking.model.AppointmentStatus;
+import com.dtp.doctor_appointment_booking.model.PaymentStatus;
 import com.dtp.doctor_appointment_booking.repository.AppointmentRepository;
 import com.dtp.doctor_appointment_booking.repository.AppointmentStatusRepository;
 import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
 import com.dtp.doctor_appointment_booking.service.AppointmentService;
+import com.dtp.doctor_appointment_booking.service.VnPayService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,15 +38,17 @@ public class AppointmentController {
     private final AppointmentStatusRepository appointmentStatusRepository;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final VnPayService vnPayService;
 
     public AppointmentController(AppointmentService appointmentService, JwtUtils jwtUtils,
                                  AppointmentStatusRepository appointmentStatusRepository, AppointmentRepository appointmentRepository,
-                                 AppointmentMapper appointmentMapper) {
+                                 AppointmentMapper appointmentMapper, VnPayService vnPayService) {
         this.appointmentService = appointmentService;
         this.jwtUtils = jwtUtils;
         this.appointmentStatusRepository = appointmentStatusRepository;
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
+        this.vnPayService = vnPayService;
     }
 
     @PostMapping("/book")
@@ -97,5 +109,18 @@ public class AppointmentController {
         Appointment appointment = appointmentService.getAppointment(appointmentId);
         AppointmentResponse response = appointmentMapper.entityToResponse(appointment);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/payment/{appointmentId}")
+    public ResponseEntity<?> payAppointment(@PathVariable String appointmentId,
+                                            HttpServletRequest request) throws UnsupportedEncodingException {
+        PaymentResponse paymentResponse = vnPayService.createPayment(appointmentId, request);
+        return ResponseEntity.ok(paymentResponse);
+    }
+
+    @GetMapping("/payment_info")
+    public ResponseEntity<?> updatePaymentStatus(HttpServletRequest request) throws Exception {
+        PaymentStatusResponse paymentStatusResponse = vnPayService.vnPayResponse(request);
+        return ResponseEntity.ok(paymentStatusResponse);
     }
 }

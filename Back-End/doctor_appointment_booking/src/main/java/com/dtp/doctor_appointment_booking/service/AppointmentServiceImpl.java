@@ -99,6 +99,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointment;
     }
 
+    @Override
+    public Appointment updatePaymentAppointment(String appointmentId, String paymentStatus) {
+        Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException(Appointment.class));
+
+        appointment.setPaymentStatus(paymentStatus);
+        appointmentRepository.save(appointment);
+
+        return appointment;
+    }
+
+    @Override
+    public Appointment updateAppointmentStatus(String appointmentId, String status) {
+        AppointmentStatus appointmentStatus = addAppointmentStatus(appointmentId, status);
+        return appointmentStatus.getAppointment();
+    }
+
     public AppointmentStatus addAppointmentStatus(String appointmentId, String status) {
         Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException(Appointment.class));
