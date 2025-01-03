@@ -3,6 +3,7 @@ package com.dtp.doctor_appointment_booking.controller;
 import com.dtp.doctor_appointment_booking.config.VnPayConfig;
 import com.dtp.doctor_appointment_booking.dto.appointment.AppointmentResponse;
 import com.dtp.doctor_appointment_booking.dto.appointment.BookAppointmentRequest;
+import com.dtp.doctor_appointment_booking.dto.email.EmailDetails;
 import com.dtp.doctor_appointment_booking.dto.payment.PaymentResponse;
 import com.dtp.doctor_appointment_booking.dto.payment.PaymentStatusResponse;
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
@@ -15,6 +16,7 @@ import com.dtp.doctor_appointment_booking.repository.AppointmentRepository;
 import com.dtp.doctor_appointment_booking.repository.AppointmentStatusRepository;
 import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
 import com.dtp.doctor_appointment_booking.service.AppointmentService;
+import com.dtp.doctor_appointment_booking.service.EmailService;
 import com.dtp.doctor_appointment_booking.service.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -39,16 +41,19 @@ public class AppointmentController {
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
     private final VnPayService vnPayService;
+    private final EmailService emailService;
 
     public AppointmentController(AppointmentService appointmentService, JwtUtils jwtUtils,
                                  AppointmentStatusRepository appointmentStatusRepository, AppointmentRepository appointmentRepository,
-                                 AppointmentMapper appointmentMapper, VnPayService vnPayService) {
+                                 AppointmentMapper appointmentMapper, VnPayService vnPayService,
+                                 EmailService emailService) {
         this.appointmentService = appointmentService;
         this.jwtUtils = jwtUtils;
         this.appointmentStatusRepository = appointmentStatusRepository;
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.vnPayService = vnPayService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/book")

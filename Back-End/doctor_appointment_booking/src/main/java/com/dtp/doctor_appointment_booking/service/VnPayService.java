@@ -1,9 +1,11 @@
 package com.dtp.doctor_appointment_booking.service;
 
 import com.dtp.doctor_appointment_booking.config.VnPayConfig;
+import com.dtp.doctor_appointment_booking.dto.email.EmailDetails;
 import com.dtp.doctor_appointment_booking.dto.payment.PaymentResponse;
 import com.dtp.doctor_appointment_booking.dto.payment.PaymentStatusResponse;
 import com.dtp.doctor_appointment_booking.model.Appointment;
+import com.dtp.doctor_appointment_booking.model.DoctorBusy;
 import com.dtp.doctor_appointment_booking.model.PaymentStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +21,14 @@ import java.util.*;
 @Service
 public class VnPayService {
     private final AppointmentService appointmentService;
+    private final DoctorBusyService doctorBusyService;
+    private final EmailService emailService;
 
-    public VnPayService(AppointmentService appointmentService) {
+    public VnPayService(AppointmentService appointmentService, DoctorBusyService doctorBusyService,
+                        EmailService emailService) {
         this.appointmentService = appointmentService;
+        this.doctorBusyService = doctorBusyService;
+        this.emailService = emailService;
     }
 
     public PaymentResponse createPayment(String appointmentId, HttpServletRequest request) throws UnsupportedEncodingException {
@@ -131,8 +138,14 @@ public class VnPayService {
                 if (checkAmount) {
                     if (checkOrderStatus) {
                         if ("00".equals(request.getParameter("vnp_ResponseCode"))) {
+                            // Update payment status to success
                             appointmentService.updatePaymentAppointment(appointmentId, PaymentStatus.SUCCESS.toString());
+                            // Update appointment status to success
                             appointmentService.updateAppointmentStatus(appointmentId, "SUCCESS");
+                            // update doctor busy time
+                            doctorBusyService.saveDoctorBusy(appointment);
+                            // send email to doctor and patient
+                            emailService.sendAppointmentNotification(appointment);
 
                             paymentStatusResponse.setRspCode("00");
                             paymentStatusResponse.setMessage("Payment success");

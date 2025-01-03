@@ -5,7 +5,11 @@ public class EndPointService {
             "/api/auth/signup",
             "/api/auth/signin",
             "/api/auth/refresh-token",
-            "/api/auth/logout"
+            "/api/auth/logout",
+    };
+
+    public static final String[] publicGetEndPoint = {
+            "/api/v1/appointment/payment/{appointmentId}",
     };
 
     public static final String[] adminGetEndPoint = {
@@ -30,5 +34,16 @@ public class EndPointService {
 
     public static final String[] userPostEndPointAuth = {
             "/api/user/update-info"
+    };
+
+    public static final String[] appointmentPostEndPointAuth = {
+            "/api/v1/appointment/book",
+            "/api/v1/appointment/cancel/{appointmentId}"
+    };
+
+    public static final String[] appointmentGetEndPointAuth = {
+            "/api/v1/appointment/my-appointments",
+            "/api/v1/appointment/{appointmentId}/details",
+            "/api/v1/appointment/payment_info",
     };
 }

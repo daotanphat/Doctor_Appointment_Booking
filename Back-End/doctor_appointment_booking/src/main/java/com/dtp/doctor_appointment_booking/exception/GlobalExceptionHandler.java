@@ -1,6 +1,7 @@
 package com.dtp.doctor_appointment_booking.exception;
 
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
+import jakarta.mail.MessagingException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -49,6 +50,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<MessageResponse> handleException(Exception exception) {
+        MessageResponse messageResponse = new MessageResponse();
+        messageResponse.setMessage(exception.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(messageResponse);
+    }
+
+    @ExceptionHandler({MessagingException.class})
+    public ResponseEntity<MessageResponse> handleMessagingException(MessagingException exception) {
         MessageResponse messageResponse = new MessageResponse();
         messageResponse.setMessage(exception.getMessage());
         return ResponseEntity
