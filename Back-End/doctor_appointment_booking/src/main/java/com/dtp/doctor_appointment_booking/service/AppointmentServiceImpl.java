@@ -7,7 +7,7 @@ import com.dtp.doctor_appointment_booking.mapper.AppointmentMapper;
 import com.dtp.doctor_appointment_booking.model.*;
 import com.dtp.doctor_appointment_booking.model.compositeKey.AppointmentStatusKey;
 import com.dtp.doctor_appointment_booking.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dtp.doctor_appointment_booking.utils.Schedule;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -31,11 +28,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final DoctorRepository doctorRepository;
     private final UserRepository userRepository;
     private final AppointmentMapper appointmentMapper;
+    private final DoctorBusyService doctorBusyService;
+    private final AppointmentStatusService appointmentStatusService;
+    private final Schedule schedule;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, StatusRepository statusRepository,
                                   AppointmentStatusRepository appointmentStatusRepository, DoctorBusyRepository doctorBusyRepository,
                                   TimeSlotRepository timeSlotRepository, DoctorRepository doctorRepository,
-                                  UserRepository userRepository, AppointmentMapper appointmentMapper) {
+                                  UserRepository userRepository, AppointmentMapper appointmentMapper,
+                                  DoctorBusyService doctorBusyService, AppointmentStatusService appointmentStatusService,
+                                  Schedule schedule) {
         this.appointmentRepository = appointmentRepository;
         this.statusRepository = statusRepository;
         this.appointmentStatusRepository = appointmentStatusRepository;
@@ -44,6 +46,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.doctorRepository = doctorRepository;
         this.userRepository = userRepository;
         this.appointmentMapper = appointmentMapper;
+        this.doctorBusyService = doctorBusyService;
+        this.appointmentStatusService = appointmentStatusService;
+        this.schedule = schedule;
     }
 
     @Transactional
@@ -68,6 +73,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         // add status to appointment status
         AppointmentStatus appointmentStatus = addAppointmentStatus(appointment.getAppointment_id(), "BOOKED");
+
+        // update doctor to be occupied
+        doctorBusyService.saveDoctorBusy(appointment, "OCCUPIED");
+
+        // Schedule delete appointment job
+        schedule.ScheduleDeleteAppointmentJob(appointment.getAppointment_id());
 
         return appointment;
     }
@@ -114,6 +125,22 @@ public class AppointmentServiceImpl implements AppointmentService {
     public Appointment updateAppointmentStatus(String appointmentId, String status) {
         AppointmentStatus appointmentStatus = addAppointmentStatus(appointmentId, status);
         return appointmentStatus.getAppointment();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAppointment(String appointmentId) {
+        Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException(Appointment.class));
+        // Delete appointment status
+        appointmentStatusService.deleteAppointmentStatusByAppointmentId(appointmentId);
+
+        // Delete doctor busy
+        DoctorBusy doctorBusy = doctorBusyService.findDoctorBusy(appointment, "OCCUPIED");
+        doctorBusyService.deleteDoctorBusy(doctorBusy.getId());
+
+        // Delete appointment
+        appointmentRepository.delete(appointment);
     }
 
     public AppointmentStatus addAppointmentStatus(String appointmentId, String status) {

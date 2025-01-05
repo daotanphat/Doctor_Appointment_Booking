@@ -16,4 +16,6 @@ public interface AppointmentService {
     Appointment updatePaymentAppointment(String appointmentId, String paymentStatus);
 
     Appointment updateAppointmentStatus(String appointmentId, String status);
+
+    void deleteAppointment(String appointmentId);
 }

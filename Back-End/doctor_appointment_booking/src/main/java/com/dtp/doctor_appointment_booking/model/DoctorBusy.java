@@ -31,4 +31,6 @@ public class DoctorBusy {
     private TimeSlot timeSlotTo;
 
     private LocalDate date;
+
+    private String status;
 }

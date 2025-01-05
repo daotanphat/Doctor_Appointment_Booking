@@ -4,5 +4,9 @@ import com.dtp.doctor_appointment_booking.model.Appointment;
 import com.dtp.doctor_appointment_booking.model.DoctorBusy;
 
 public interface DoctorBusyService {
-    DoctorBusy saveDoctorBusy(Appointment appointment);
+    DoctorBusy saveDoctorBusy(Appointment appointment, String status);
+
+    DoctorBusy findDoctorBusy(Appointment appointment, String status);
+
+    void deleteDoctorBusy(int doctorBusyId);
 }

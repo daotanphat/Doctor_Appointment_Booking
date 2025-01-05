@@ -143,7 +143,7 @@ public class VnPayService {
                             // Update appointment status to success
                             appointmentService.updateAppointmentStatus(appointmentId, "SUCCESS");
                             // update doctor busy time
-                            doctorBusyService.saveDoctorBusy(appointment);
+                            doctorBusyService.saveDoctorBusy(appointment, "BUSY");
                             // send email to doctor and patient
                             emailService.sendAppointmentNotification(appointment);
 
