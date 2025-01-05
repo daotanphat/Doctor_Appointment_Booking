@@ -14,14 +14,20 @@ export const api = axios.create({
 // Request Interceptor to add the access token to headers if it exists
 api.interceptors.request.use(
     (config) => {
+        // Define the list of API paths that require the Authorization token
+        const pathsRequiringToken = [
+            '/api/user/my-info',
+            '/api/user/my-appointments',
+        ];
 
-        if (!config.url.includes('/api/auth/') && !config.url.includes('/api/user/')) {
-            const state = store.getState(); // Access the entire Redux store state
-            const accessToken = state.auth.accessToken;
-            console.log(accessToken + ' token - api.jsx');
-
-            if (accessToken) {
-                config.headers['Authorization'] = `Bearer ${accessToken}`;
+        // Check if the URL matches any of the paths requiring a token
+        if (pathsRequiringToken.some(path => config.url.includes(path))) {
+            const accessToken = localStorage.getItem('token');
+            if (!accessToken && !window.location.pathname.includes('/login')) {
+                window.location.href = '/login'; // Redirect to login page
+                return Promise.reject(new Error('No access token found, redirecting to login'));
+            } else {
+                config.headers.Authorization = `Bearer ${accessToken}`
             }
         }
 
@@ -41,24 +47,25 @@ api.interceptors.response.use(
         // If the error response status is 401 (Unauthorized) and the request has not been retried
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-            console.log('error 3');
 
             // Get the refresh token from Redux store
-            const refreshTokenFromStore = store.getState().auth.refreshToken;
+            const refreshTokenFromStore = localStorage.getItem('refreshToken');
 
-            try {
-                // Call the refresh token API to get a new access token
-                const response = await refreshTokenRequest(refreshTokenFromStore);
+            if (refreshTokenFromStore !== null) {
+                try {
+                    // Call the refresh token API to get a new access token
+                    const response = await refreshTokenRequest(refreshTokenFromStore);
 
-                // Retry the original request with the new access token
-                originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;
-                return api(originalRequest); // Retry the original request with the new token
-            } catch (refreshError) {
-                // If refresh token fails, logout the user
-                const accessToken = store.getState().auth.jwt;
-                store.dispatch(logout(accessToken));
-                window.location.href = '/login'; // Redirect to login page
-                return Promise.reject(refreshError);
+                    // Retry the original request with the new access token
+                    originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;
+                    return api(originalRequest); // Retry the original request with the new token
+                } catch (refreshError) {
+                    // If refresh token fails, logout the user
+                    const email = store.getState().auth.user;
+                    store.dispatch(logout(email));
+                    window.location.href = '/login'; // Redirect to login page
+                    return Promise.reject(refreshError);
+                }
             }
         }
 
