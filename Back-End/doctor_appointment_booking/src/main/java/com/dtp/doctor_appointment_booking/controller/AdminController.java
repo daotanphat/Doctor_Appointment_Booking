@@ -1,7 +1,9 @@
 package com.dtp.doctor_appointment_booking.controller;
 
 import com.dtp.doctor_appointment_booking.dto.request.AddDoctorRequest;
+import com.dtp.doctor_appointment_booking.dto.response.DoctorResponse;
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
+import com.dtp.doctor_appointment_booking.mapper.DoctorMapper;
 import com.dtp.doctor_appointment_booking.model.Doctor;
 import com.dtp.doctor_appointment_booking.model.Speciality;
 import com.dtp.doctor_appointment_booking.service.CloudinaryService;
@@ -64,5 +66,12 @@ public class AdminController {
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
                                          @RequestParam("folder") String folderName) throws IOException {
         return ResponseEntity.ok(cloudinaryService.uploadFile(file, folderName));
+    }
+
+    @GetMapping("/update-doctor-status/{doctorId}")
+    public ResponseEntity<DoctorResponse> updateDoctorStatus(@PathVariable("doctorId") String doctorId) {
+        Doctor doctor = doctorService.updateDoctorStatus(doctorId);
+        DoctorResponse response = DoctorMapper.INSTANCE.entityToResponse(doctor);
+        return ResponseEntity.ok(response);
     }
 }

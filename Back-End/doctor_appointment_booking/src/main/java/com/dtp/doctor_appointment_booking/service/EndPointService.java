@@ -13,7 +13,8 @@ public class EndPointService {
     };
 
     public static final String[] adminGetEndPoint = {
-            "/api/admin/specialities"
+            "/api/admin/specialities",
+            "/api/admin/update-doctor-status/{doctorId}",
     };
 
     public static final String[] adminPostEndPoint = {

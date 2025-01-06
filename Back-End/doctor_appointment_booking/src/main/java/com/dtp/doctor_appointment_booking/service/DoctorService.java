@@ -18,4 +18,6 @@ public interface DoctorService {
     DoctorResponse getDoctorById(String id);
 
     List<DoctorResponse> getDoctorBySpeciality(String speciality);
+
+    Doctor updateDoctorStatus(String doctorId);
 }

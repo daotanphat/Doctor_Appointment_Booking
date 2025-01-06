@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -75,5 +76,15 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public List<DoctorResponse> getDoctorBySpeciality(String speciality) {
         return doctorRepository.getDoctorBySpecialityName(speciality);
+    }
+
+    @Override
+    @Transactional
+    public Doctor updateDoctorStatus(String doctorId) {
+        Doctor doctor = doctorRepository.findByDoctor_id(doctorId)
+                .orElseThrow(() -> new EntityNotFoundException(Doctor.class));
+        doctor.setStatus(!doctor.isStatus());
+        doctorRepository.save(doctor);
+        return doctor;
     }
 }
