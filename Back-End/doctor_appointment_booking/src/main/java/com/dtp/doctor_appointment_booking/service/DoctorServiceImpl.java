@@ -6,7 +6,11 @@ import com.dtp.doctor_appointment_booking.exception.EntityNotFoundException;
 import com.dtp.doctor_appointment_booking.exception.IllegalArgumentException;
 import com.dtp.doctor_appointment_booking.mapper.DoctorMapper;
 import com.dtp.doctor_appointment_booking.model.Doctor;
+import com.dtp.doctor_appointment_booking.model.Role;
+import com.dtp.doctor_appointment_booking.model.User;
 import com.dtp.doctor_appointment_booking.repository.DoctorRepository;
+import com.dtp.doctor_appointment_booking.repository.RoleRepository;
+import com.dtp.doctor_appointment_booking.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,19 +21,27 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DoctorServiceImpl implements DoctorService {
-    @Autowired
-    DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
+    private final CloudinaryService cloudinaryService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    CloudinaryService cloudinaryService;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    public DoctorServiceImpl(DoctorRepository doctorRepository, CloudinaryService cloudinaryService,
+                             PasswordEncoder passwordEncoder, UserRepository userRepository, RoleRepository roleRepository) {
+        this.doctorRepository = doctorRepository;
+        this.cloudinaryService = cloudinaryService;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     public Doctor saveDoctor(AddDoctorRequest request, MultipartFile image) {
@@ -49,8 +61,29 @@ public class DoctorServiceImpl implements DoctorService {
                     .get("secure_url")
                     .toString();
             doctor.setImageUrl(imageUrl); // Upload image to cloudinary and set image url to doctor entity
+            Doctor doctorSaved = doctorRepository.save(doctor);
 
-            return doctorRepository.save(doctor);
+            // save user to database
+            User user = new User();
+            user.setEmail(doctor.getEmail());
+            user.setPassword(doctor.getPassword());
+            user.setFullName(doctor.getFullName());
+            user.setDateOfBirth(doctor.getDateOfBirth());
+            user.setPhone(doctor.getPhone());
+            user.setAddress(doctor.getAddress());
+            user.setGender(doctor.isGender());
+            user.setImageUrl(doctor.getImageUrl());
+            user.setStatus(doctor.isStatus());
+
+            Set<Role> roles = new HashSet<>();
+            Role role = roleRepository.findByName("DOCTOR")
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(role);
+            user.setRoles(roles);
+
+            userRepository.save(user);
+
+            return doctorSaved;
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
