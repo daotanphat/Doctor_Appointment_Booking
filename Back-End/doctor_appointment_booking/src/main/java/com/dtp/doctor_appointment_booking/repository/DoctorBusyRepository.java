@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -15,7 +16,7 @@ public interface DoctorBusyRepository extends JpaRepository<DoctorBusy, Integer>
     @Query("SELECT db FROM DoctorBusy db" +
             " WHERE db.doctor.doctor_id = :doctorId" +
             " AND db.date = :date")
-    Set<DoctorBusy> findByDoctorIdAndDate(String doctorId, LocalDate date);
+    List<DoctorBusy> findByDoctorIdAndDate(String doctorId, LocalDate date);
 
     @Query("SELECT db FROM DoctorBusy db" +
             " WHERE db.doctor.doctor_id = :doctorId" +
