@@ -46,5 +46,6 @@ public class EndPointService {
             "/api/v1/appointment/my-appointments",
             "/api/v1/appointment/{appointmentId}/details",
             "/api/v1/appointment/payment_info",
+            "/api/v1/appointment/doctor-appointments",
     };
 }

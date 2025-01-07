@@ -143,6 +143,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.delete(appointment);
     }
 
+    @Override
+    public Page<Appointment> getAppointmentByDoctor(String doctorEmail, String patientEmail, LocalDate dateSlot,
+                                                    String paymentStatus, String status, boolean dateDesc,
+                                                    int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return appointmentRepository.findAllByDoctor(doctorEmail, patientEmail, dateSlot,
+                paymentStatus, status, dateDesc, pageable);
+    }
+
     public AppointmentStatus addAppointmentStatus(String appointmentId, String status) {
         Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException(Appointment.class));

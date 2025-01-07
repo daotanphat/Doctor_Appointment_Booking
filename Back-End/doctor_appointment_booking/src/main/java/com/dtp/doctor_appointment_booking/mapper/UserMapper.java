@@ -2,6 +2,7 @@ package com.dtp.doctor_appointment_booking.mapper;
 
 import com.dtp.doctor_appointment_booking.dto.request.UpdateUserRequest;
 import com.dtp.doctor_appointment_booking.dto.response.UserResponse;
+import com.dtp.doctor_appointment_booking.model.Doctor;
 import com.dtp.doctor_appointment_booking.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

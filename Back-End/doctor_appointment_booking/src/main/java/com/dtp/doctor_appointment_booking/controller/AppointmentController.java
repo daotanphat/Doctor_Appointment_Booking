@@ -13,16 +13,16 @@ import com.dtp.doctor_appointment_booking.repository.AppointmentRepository;
 import com.dtp.doctor_appointment_booking.repository.AppointmentStatusRepository;
 import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
 import com.dtp.doctor_appointment_booking.service.AppointmentService;
-import com.dtp.doctor_appointment_booking.service.EmailService;
 import com.dtp.doctor_appointment_booking.service.VnPayService;
-import com.dtp.doctor_appointment_booking.utils.Schedule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -31,17 +31,15 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
     private final JwtUtils jwtUtils;
     private final AppointmentStatusRepository appointmentStatusRepository;
-    private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
     private final VnPayService vnPayService;
 
     public AppointmentController(AppointmentService appointmentService, JwtUtils jwtUtils,
-                                 AppointmentStatusRepository appointmentStatusRepository, AppointmentRepository appointmentRepository,
+                                 AppointmentStatusRepository appointmentStatusRepository,
                                  AppointmentMapper appointmentMapper, VnPayService vnPayService) {
         this.appointmentService = appointmentService;
         this.jwtUtils = jwtUtils;
         this.appointmentStatusRepository = appointmentStatusRepository;
-        this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.vnPayService = vnPayService;
     }
@@ -117,5 +115,28 @@ public class AppointmentController {
     public ResponseEntity<?> updatePaymentStatus(HttpServletRequest request) throws Exception {
         PaymentStatusResponse paymentStatusResponse = vnPayService.vnPayResponse(request);
         return ResponseEntity.ok(paymentStatusResponse);
+    }
+
+    @GetMapping("/doctor-appointments")
+    public ResponseEntity<PageResponse<AppointmentResponse>> getAppointmentsByDoctor(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(value = "patientEmail", required = false) String patientEmail,
+            @RequestParam(value = "dateSlot", required = false) LocalDate dateSlot,
+            @RequestParam(value = "paymentStatus", required = false) String paymentStatus,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "dateDesc", defaultValue = "true") boolean dateDesc,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        token = token.replace("Bearer ", "");
+        String doctorEmail = jwtUtils.getUserNameFromJwtToken(token);
+        Page<Appointment> appointmentsPage = appointmentService.getAppointmentByDoctor(doctorEmail, patientEmail,
+                dateSlot, paymentStatus, status, dateDesc, page, size);
+        List<Appointment> appointments = appointmentsPage.getContent();
+        int totalPages = appointmentsPage.getTotalPages();
+
+        List<AppointmentResponse> appointmentResponses = appointmentMapper.entitiesToResponses(appointments);
+        PageResponse<AppointmentResponse> response = new PageResponse<>(appointmentResponses, totalPages);
+
+        return ResponseEntity.ok(response);
     }
 }

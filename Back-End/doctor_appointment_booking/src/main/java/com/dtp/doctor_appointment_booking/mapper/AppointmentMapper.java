@@ -44,7 +44,31 @@ public abstract class AppointmentMapper {
         );
     }
 
-    public abstract List<AppointmentResponse> entitiesToResponses(List<Appointment> appointments);
+    public List<AppointmentResponse> entitiesToResponses(List<Appointment> appointments) {
+        List<AppointmentResponse> appointmentResponses = new ArrayList<>();
+
+        for (Appointment appointment : appointments) {
+            AppointmentResponse response = new AppointmentResponse();
+            response.setAppointment_id(appointment.getAppointment_id());
+            response.setDoctor(appointment.getDoctor().getFullName());
+            response.setPatient(appointment.getPatient().getFullName());
+            response.setFee(appointment.getFee());
+            response.setDateSlot(appointment.getDateSlot());
+            response.setTimeSlotFrom(appointment.getTimeSlotFrom().getTime());
+            response.setTimeSlotTo(appointment.getTimeSlotTo().getTime());
+            response.setAddress(appointment.getAddress());
+
+            AppointmentStatus appointmentStatus = appointmentStatusRepository
+                    .findByAppointmentIdOrderByCreatedAtDesc(appointment.getAppointment_id());
+            response.setStatus(appointmentStatus.getStatus().getStatus());
+
+            response.setPaymentStatus(appointment.getPaymentStatus());
+            response.setCreatedAt(appointment.getCreatedAt());
+            appointmentResponses.add(response);
+        }
+
+        return appointmentResponses;
+    }
 
     public String mapStatus(Appointment appointment) {
         List<AppointmentStatus> statuses = new ArrayList<>(appointment.getStatuses());

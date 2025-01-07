@@ -4,6 +4,8 @@ import com.dtp.doctor_appointment_booking.dto.appointment.BookAppointmentRequest
 import com.dtp.doctor_appointment_booking.model.Appointment;
 import org.springframework.data.domain.Page;
 
+import java.time.LocalDate;
+
 public interface AppointmentService {
     Appointment bookAppointment(BookAppointmentRequest request);
 
@@ -18,4 +20,7 @@ public interface AppointmentService {
     Appointment updateAppointmentStatus(String appointmentId, String status);
 
     void deleteAppointment(String appointmentId);
+
+    Page<Appointment> getAppointmentByDoctor(String doctorEmail, String patientEmail, LocalDate dateSlot,
+                                             String paymentStatus, String status, boolean dateDesc, int page, int size);
 }

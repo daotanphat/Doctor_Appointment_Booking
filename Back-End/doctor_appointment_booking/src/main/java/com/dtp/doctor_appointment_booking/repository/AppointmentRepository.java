@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
@@ -25,4 +26,20 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query("SELECT a FROM Appointment a" +
             " WHERE a.appointment_id = :appointmentId")
     Optional<Appointment> findByAppointment_id(String appointmentId);
+
+    @Query("SELECT a FROM Appointment a" +
+            " JOIN a.statuses s" +
+            " WHERE a.doctor.email = :doctorEmail" +
+            " AND (:patientEmail IS NULL OR LOWER(a.patient.email) LIKE LOWER(CONCAT('%', :patientEmail, '%')))" +
+            " AND (:dateSlot IS NULL OR a.dateSlot = :dateSlot)" +
+            " AND (:paymentStatus IS NULL OR a.paymentStatus = :paymentStatus)" +
+            " AND (:status IS NULL OR s.status = :status)" +
+            " ORDER BY :dateDesc DESC")
+    Page<Appointment> findAllByDoctor(@Param("doctorEmail") String doctorEmail,
+                                      @Param("patientEmail") String patientEmail,
+                                      @Param("dateSlot") LocalDate dateSlot,
+                                      @Param("paymentStatus") String paymentStatus,
+                                      @Param("status") String status,
+                                      @Param("dateDesc") boolean dateDesc,
+                                      Pageable pageable);
 }
