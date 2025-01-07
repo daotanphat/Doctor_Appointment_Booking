@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -169,7 +170,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     public boolean isTimeSlotAvailable(String doctorId, LocalDate date, int timeSlotFrom, int timeSlotTo) {
-        Set<DoctorBusy> doctorBusies = doctorBusyRepository.findByDoctorIdAndDate(doctorId, date);
+        List<DoctorBusy> doctorBusies = doctorBusyRepository.findByDoctorIdAndDate(doctorId, date);
 
         TimeSlot requestedTimeSlotStart = timeSlotRepository.findById(timeSlotFrom).orElseThrow();
         TimeSlot requestedTimeSlotEnd = timeSlotRepository.findById(timeSlotTo).orElseThrow();
