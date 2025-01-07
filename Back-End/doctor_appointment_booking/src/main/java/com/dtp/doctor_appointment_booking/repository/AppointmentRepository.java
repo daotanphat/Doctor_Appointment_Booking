@@ -33,8 +33,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
             " AND (:patientEmail IS NULL OR LOWER(a.patient.email) LIKE LOWER(CONCAT('%', :patientEmail, '%')))" +
             " AND (:dateSlot IS NULL OR a.dateSlot = :dateSlot)" +
             " AND (:paymentStatus IS NULL OR a.paymentStatus = :paymentStatus)" +
-            " AND (:status IS NULL OR s.status = :status)" +
-            " ORDER BY :dateDesc DESC")
+            " AND (:status IS NULL OR s.status.status = :status)" +
+            " ORDER BY CASE WHEN :dateDesc = true THEN a.dateSlot END DESC," +
+            " CASE WHEN :dateDesc = false THEN a.dateSlot END ASC")
     Page<Appointment> findAllByDoctor(@Param("doctorEmail") String doctorEmail,
                                       @Param("patientEmail") String patientEmail,
                                       @Param("dateSlot") LocalDate dateSlot,

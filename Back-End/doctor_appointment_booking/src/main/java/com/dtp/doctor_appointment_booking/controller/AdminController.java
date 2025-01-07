@@ -26,18 +26,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
-    @Autowired
-    DoctorService doctorService;
+    private final DoctorService doctorService;
+    private final SpecialityService specialityService;
+    private final CloudinaryService cloudinaryService;
 
-    @Autowired
-    SpecialityService specialityService;
-
-    @Autowired
-    CloudinaryService cloudinaryService;
+    public AdminController(DoctorService doctorService, SpecialityService specialityService, CloudinaryService cloudinaryService) {
+        this.doctorService = doctorService;
+        this.specialityService = specialityService;
+        this.cloudinaryService = cloudinaryService;
+    }
 
     @PostMapping("/add-doctor")
-    public ResponseEntity<MessageResponse> addDoctor(@RequestPart AddDoctorRequest doctor,
+    public ResponseEntity<MessageResponse> addDoctor(@RequestPart("doctor") String doctorJson,
                                                      @RequestPart("image") MultipartFile image) throws JsonProcessingException {
+        // Parse the doctor JSON into an object
+        ObjectMapper objectMapper = new ObjectMapper();
+        AddDoctorRequest doctor = objectMapper.readValue(doctorJson, AddDoctorRequest.class);
         doctorService.saveDoctor(doctor, image);
         MessageResponse messageResponse = new MessageResponse("Doctor added successfully");
 
