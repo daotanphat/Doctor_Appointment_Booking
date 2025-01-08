@@ -5,7 +5,9 @@ import com.dtp.doctor_appointment_booking.dto.response.DoctorResponse;
 import com.dtp.doctor_appointment_booking.dto.response.MessageResponse;
 import com.dtp.doctor_appointment_booking.dto.response.PageResponse;
 import com.dtp.doctor_appointment_booking.dto.response.UserResponse;
+import com.dtp.doctor_appointment_booking.mapper.UserMapper;
 import com.dtp.doctor_appointment_booking.model.Speciality;
+import com.dtp.doctor_appointment_booking.model.User;
 import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
 import com.dtp.doctor_appointment_booking.service.DoctorService;
 import com.dtp.doctor_appointment_booking.service.SpecialityService;
@@ -70,7 +72,9 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserInfo(@RequestHeader("Authorization") String token) {
         token = token.replace("Bearer ", "");
         String email = jwtUtils.getUserNameFromJwtToken(token);
-        return ResponseEntity.ok(userService.getUserInfo(email));
+        User user = userService.getUserInfo(email);
+        return ResponseEntity
+                .ok(UserMapper.INSTANCE.entityToResponse(user));
     }
 
     @PostMapping("/update-info")

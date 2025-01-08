@@ -33,4 +33,7 @@ public class DoctorBusy {
     private LocalDate date;
 
     private String status;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private User createBy;
 }

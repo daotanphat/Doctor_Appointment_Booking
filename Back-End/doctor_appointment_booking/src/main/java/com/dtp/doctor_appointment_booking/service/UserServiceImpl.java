@@ -15,17 +15,17 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    private final UserRepository userRepository;
+    private final CloudinaryService cloudinaryService;
 
-    public UserResponse getUserInfo(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            return UserMapper.INSTANCE.entityToResponse(userOptional.get());
-        }
-        throw new EntityNotFoundException(User.class);
+    public UserServiceImpl(UserRepository userRepository, CloudinaryService cloudinaryService) {
+        this.userRepository = userRepository;
+        this.cloudinaryService = cloudinaryService;
+    }
+
+    public User getUserInfo(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(User.class));
     }
 
     @Override
