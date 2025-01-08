@@ -4,9 +4,13 @@ import com.dtp.doctor_appointment_booking.dto.DoctorBusy.request.CreateDoctorBus
 import com.dtp.doctor_appointment_booking.exception.SlotUnavailableException;
 import com.dtp.doctor_appointment_booking.model.*;
 import com.dtp.doctor_appointment_booking.repository.DoctorBusyRepository;
+import com.dtp.doctor_appointment_booking.repository.DoctorRepository;
 import com.dtp.doctor_appointment_booking.repository.TimeSlotRepository;
 import com.dtp.doctor_appointment_booking.utils.TimeSlotUtils;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class DoctorBusyServiceImpl implements DoctorBusyService {
@@ -15,15 +19,17 @@ public class DoctorBusyServiceImpl implements DoctorBusyService {
     private final TimeSlotService timeSlotService;
     private final TimeSlotRepository timeSlotRepository;
     private final UserService userService;
+    private final DoctorRepository doctorRepository;
 
     public DoctorBusyServiceImpl(DoctorBusyRepository doctorBusyRepository, DoctorService doctorService,
                                  TimeSlotService timeSlotService, TimeSlotRepository timeSlotRepository,
-                                 UserService userService) {
+                                 UserService userService, DoctorRepository doctorRepository) {
         this.doctorBusyRepository = doctorBusyRepository;
         this.doctorService = doctorService;
         this.timeSlotService = timeSlotService;
         this.timeSlotRepository = timeSlotRepository;
         this.userService = userService;
+        this.doctorRepository = doctorRepository;
     }
 
     @Override
@@ -72,5 +78,10 @@ public class DoctorBusyServiceImpl implements DoctorBusyService {
         doctorBusy.setStatus("BUSY");
         doctorBusy.setCreateBy(user);
         return doctorBusyRepository.save(doctorBusy);
+    }
+
+    @Override
+    public List<DoctorBusy> getTimeBusyCreateByDoctorAndDate(int doctorId, LocalDate date) {
+        return doctorBusyRepository.findByDoctorCreatedAndDate(doctorId, date, "DOCTOR");
     }
 }

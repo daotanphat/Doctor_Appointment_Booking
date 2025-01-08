@@ -49,6 +49,11 @@ public class EndPointService {
             "/api/v1/appointment/doctor-appointments",
     };
 
+    public static final String[] doctorBusyGetEndPointAuth = {
+            "/api/v1/doctor-busy/created-by-doctor/{date}",
+            "/api/v1/doctor-busy/delete/{id}",
+    };
+
     public static final String[] doctorBusyPostEndPointAuth = {
             "/api/v1/doctor-busy/save",
     };

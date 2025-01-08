@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface DoctorBusyRepository extends JpaRepository<DoctorBusy, Integer> {
@@ -25,8 +24,17 @@ public interface DoctorBusyRepository extends JpaRepository<DoctorBusy, Integer>
             " AND db.timeSlotTo.time = :to" +
             " AND db.status = :status")
     DoctorBusy findDoctorOccupied(@Param("doctorId") String doctorId,
-                                       @Param("date") LocalDate date,
-                                       @Param("from") LocalTime from,
-                                       @Param("to") LocalTime to,
-                                       @Param("status") String status);
+                                  @Param("date") LocalDate date,
+                                  @Param("from") LocalTime from,
+                                  @Param("to") LocalTime to,
+                                  @Param("status") String status);
+
+    @Query("SELECT db FROM DoctorBusy db" +
+            " JOIN db.createBy.roles r" +
+            " WHERE r.name = :doctor" +
+            " AND db.createBy.id = :doctorId" +
+            " AND db.date = :date")
+    List<DoctorBusy> findByDoctorCreatedAndDate(@Param("doctorId") int doctorId,
+                                                @Param("date") LocalDate date,
+                                                @Param("doctor") String doctorRole);
 }

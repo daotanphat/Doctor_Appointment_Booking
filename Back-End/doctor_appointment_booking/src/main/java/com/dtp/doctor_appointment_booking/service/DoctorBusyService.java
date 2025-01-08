@@ -5,7 +5,7 @@ import com.dtp.doctor_appointment_booking.model.Appointment;
 import com.dtp.doctor_appointment_booking.model.DoctorBusy;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
 
 public interface DoctorBusyService {
     DoctorBusy saveDoctorBusy(Appointment appointment, String status);
@@ -15,4 +15,6 @@ public interface DoctorBusyService {
     void deleteDoctorBusy(int doctorBusyId);
 
     DoctorBusy saveDoctorBusy(CreateDoctorBusyRequest request);
+
+    List<DoctorBusy> getTimeBusyCreateByDoctorAndDate(int doctorId, LocalDate date);
 }
