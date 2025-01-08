@@ -20,4 +20,6 @@ public interface DoctorService {
     List<DoctorResponse> getDoctorBySpeciality(String speciality);
 
     Doctor updateDoctorStatus(String doctorId);
+
+    Doctor getDoctorByEmail(String email);
 }

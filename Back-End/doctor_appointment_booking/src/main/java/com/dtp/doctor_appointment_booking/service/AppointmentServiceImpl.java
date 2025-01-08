@@ -8,6 +8,7 @@ import com.dtp.doctor_appointment_booking.model.*;
 import com.dtp.doctor_appointment_booking.model.compositeKey.AppointmentStatusKey;
 import com.dtp.doctor_appointment_booking.repository.*;
 import com.dtp.doctor_appointment_booking.utils.Schedule;
+import com.dtp.doctor_appointment_booking.utils.TimeSlotUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -56,7 +57,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment bookAppointment(BookAppointmentRequest request) {
         // check valid slot
-        if (!isTimeSlotAvailable(request.getDoctor_id(), request.getDateSlot(), request.getTimeSlotFrom(), request.getTimeSlotTo())) {
+        if (!TimeSlotUtils.isTimeSlotAvailable(doctorBusyRepository, timeSlotRepository, request.getDoctor_id(),
+                request.getDateSlot(), request.getTimeSlotFrom(), request.getTimeSlotTo())) {
             throw new SlotUnavailableException("Slot not available");
         }
 
@@ -167,29 +169,5 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentStatus.setAppointment(appointment);
         appointmentStatus.setStatus(statusObject);
         return appointmentStatusRepository.save(appointmentStatus);
-    }
-
-    public boolean isTimeSlotAvailable(String doctorId, LocalDate date, int timeSlotFrom, int timeSlotTo) {
-        List<DoctorBusy> doctorBusies = doctorBusyRepository.findByDoctorIdAndDate(doctorId, date);
-
-        TimeSlot requestedTimeSlotStart = timeSlotRepository.findById(timeSlotFrom).orElseThrow();
-        TimeSlot requestedTimeSlotEnd = timeSlotRepository.findById(timeSlotTo).orElseThrow();
-
-        LocalTime timeStart = requestedTimeSlotStart.getTime();
-        LocalTime timeEnd = requestedTimeSlotEnd.getTime();
-
-        for (DoctorBusy doctorBusy : doctorBusies) {
-            LocalTime doctorBusyTimeStart = doctorBusy.getTimeSlotFrom().getTime();
-            LocalTime doctorBusyTimeEnd = doctorBusy.getTimeSlotTo().getTime();
-
-            if (isSlotOverlapping(timeStart, timeEnd, doctorBusyTimeStart, doctorBusyTimeEnd)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isSlotOverlapping(LocalTime timeStart, LocalTime timeEnd, LocalTime busyStart, LocalTime busyEnd) {
-        return timeStart.isBefore(busyEnd) && timeEnd.isAfter(busyStart);
     }
 }

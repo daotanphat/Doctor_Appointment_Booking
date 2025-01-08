@@ -48,4 +48,8 @@ public class EndPointService {
             "/api/v1/appointment/payment_info",
             "/api/v1/appointment/doctor-appointments",
     };
+
+    public static final String[] doctorBusyPostEndPointAuth = {
+            "/api/v1/doctor-busy/save",
+    };
 }

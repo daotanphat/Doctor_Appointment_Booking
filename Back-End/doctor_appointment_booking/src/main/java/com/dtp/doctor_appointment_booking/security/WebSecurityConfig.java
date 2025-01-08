@@ -68,15 +68,16 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         {
-                            auth.requestMatchers(HttpMethod.POST, EndPointService.publicPostEndPoint).permitAll();
                             auth.requestMatchers(HttpMethod.GET, EndPointService.publicGetEndPoint).permitAll();
+                            auth.requestMatchers(HttpMethod.POST, EndPointService.publicPostEndPoint).permitAll();
                             auth.requestMatchers(HttpMethod.GET, EndPointService.adminGetEndPoint).hasAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.POST, EndPointService.adminPostEndPoint).hasAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.GET, EndPointService.userGetEndPointAuth).hasAuthority("USER");
                             auth.requestMatchers(HttpMethod.POST, EndPointService.userPostEndPointAuth).hasAuthority("USER");
                             auth.requestMatchers(HttpMethod.GET, EndPointService.userGetEndPoint).permitAll();
-                            auth.requestMatchers(HttpMethod.POST, EndPointService.appointmentPostEndPointAuth).hasAnyAuthority("USER", "DOCTOR");
                             auth.requestMatchers(HttpMethod.GET, EndPointService.appointmentGetEndPointAuth).hasAnyAuthority("USER", "DOCTOR");
+                            auth.requestMatchers(HttpMethod.POST, EndPointService.appointmentPostEndPointAuth).hasAnyAuthority("USER", "DOCTOR");
+                            auth.requestMatchers(HttpMethod.POST, EndPointService.doctorBusyPostEndPointAuth).hasAuthority("DOCTOR");
                         }
                 );
 

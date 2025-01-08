@@ -120,4 +120,10 @@ public class DoctorServiceImpl implements DoctorService {
         doctorRepository.save(doctor);
         return doctor;
     }
+
+    @Override
+    public Doctor getDoctorByEmail(String email) {
+        return doctorRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(Doctor.class));
+    }
 }
