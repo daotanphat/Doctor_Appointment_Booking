@@ -47,4 +47,8 @@ public interface DoctorBusyRepository extends JpaRepository<DoctorBusy, Integer>
                                               @Param("date") LocalDate date,
                                               @Param("timeFrom") LocalTime timeFrom,
                                               @Param("timeTo") LocalTime timeTo);
+
+    @Query("SELECT db FROM DoctorBusy db" +
+            " WHERE db.date < :date")
+    List<DoctorBusy> findBusyTimeInThePast(@Param("date") LocalDate date);
 }

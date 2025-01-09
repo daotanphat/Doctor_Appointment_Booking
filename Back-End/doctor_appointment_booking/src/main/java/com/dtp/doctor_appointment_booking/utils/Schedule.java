@@ -1,5 +1,6 @@
 package com.dtp.doctor_appointment_booking.utils;
 
+import jakarta.annotation.PostConstruct;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -30,6 +31,26 @@ public class Schedule {
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             throw new RuntimeException("Error delete appointment not payment job");
+        }
+    }
+
+    @PostConstruct
+    public void scheduleDeleteBusyTimeInThePast() {
+        try {
+            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+            JobDetail jobDetail = JobBuilder.newJob(DeleteBusyTimeJob.class)
+                    .withIdentity("DeleteBusyTimeInThePast", "DailyJobs")
+                    .build();
+
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("DailyTrigger", "DailyJobs")
+                    .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(0, 34))
+                    .build();
+
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            throw new RuntimeException("Error delete busy time which is in the past");
         }
     }
 }
