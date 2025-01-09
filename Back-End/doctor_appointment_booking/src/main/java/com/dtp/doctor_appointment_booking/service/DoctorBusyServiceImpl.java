@@ -84,4 +84,14 @@ public class DoctorBusyServiceImpl implements DoctorBusyService {
     public List<DoctorBusy> getTimeBusyCreateByDoctorAndDate(int doctorId, LocalDate date) {
         return doctorBusyRepository.findByDoctorCreatedAndDate(doctorId, date, "DOCTOR");
     }
+
+    @Override
+    public DoctorBusy updateDoctorBusyStatus(Appointment appointment, String status) {
+        DoctorBusy doctorBusy = doctorBusyRepository.findByDoctorAndDateAndTimeSlot(
+                appointment.getDoctor().getId(), appointment.getDateSlot(),
+                appointment.getTimeSlotFrom().getTime(), appointment.getTimeSlotTo().getTime());
+
+        doctorBusy.setStatus(status);
+        return doctorBusyRepository.save(doctorBusy);
+    }
 }

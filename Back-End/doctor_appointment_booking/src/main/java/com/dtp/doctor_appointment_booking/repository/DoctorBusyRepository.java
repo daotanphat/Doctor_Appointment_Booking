@@ -37,4 +37,14 @@ public interface DoctorBusyRepository extends JpaRepository<DoctorBusy, Integer>
     List<DoctorBusy> findByDoctorCreatedAndDate(@Param("doctorId") int doctorId,
                                                 @Param("date") LocalDate date,
                                                 @Param("doctor") String doctorRole);
+
+    @Query("SELECT db FROM DoctorBusy db" +
+            " WHERE db.doctor.id = : doctorId" +
+            " AND db.date = :date" +
+            " AND db.timeSlotFrom.time = :timeFrom" +
+            " AND db.timeSlotTo.time = :timeTo")
+    DoctorBusy findByDoctorAndDateAndTimeSlot(@Param("doctorId") int doctorId,
+                                              @Param("date") LocalDate date,
+                                              @Param("timeFrom") LocalTime timeFrom,
+                                              @Param("timeTo") LocalTime timeTo);
 }

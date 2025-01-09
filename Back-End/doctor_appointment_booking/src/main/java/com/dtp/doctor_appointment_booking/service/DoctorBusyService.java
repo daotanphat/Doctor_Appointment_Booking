@@ -17,4 +17,6 @@ public interface DoctorBusyService {
     DoctorBusy saveDoctorBusy(CreateDoctorBusyRequest request);
 
     List<DoctorBusy> getTimeBusyCreateByDoctorAndDate(int doctorId, LocalDate date);
+
+    DoctorBusy updateDoctorBusyStatus(Appointment appointment, String status);
 }
