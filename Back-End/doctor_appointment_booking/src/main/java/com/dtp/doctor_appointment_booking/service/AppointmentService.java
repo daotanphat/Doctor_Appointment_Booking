@@ -2,6 +2,7 @@ package com.dtp.doctor_appointment_booking.service;
 
 import com.dtp.doctor_appointment_booking.dto.appointment.BookAppointmentRequest;
 import com.dtp.doctor_appointment_booking.model.Appointment;
+import com.dtp.doctor_appointment_booking.model.User;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
@@ -23,4 +24,6 @@ public interface AppointmentService {
 
     Page<Appointment> getAppointmentByDoctor(String doctorEmail, String patientEmail, LocalDate dateSlot,
                                              String paymentStatus, String status, boolean dateDesc, int page, int size);
+
+    int numberAppointmentByStatus(User user, String status);
 }

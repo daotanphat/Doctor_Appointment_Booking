@@ -75,7 +75,7 @@ public class WebSecurityConfig {
                             auth.requestMatchers(HttpMethod.GET, EndPointService.userGetEndPointAuth).hasAuthority("USER");
                             auth.requestMatchers(HttpMethod.POST, EndPointService.userPostEndPointAuth).hasAuthority("USER");
                             auth.requestMatchers(HttpMethod.GET, EndPointService.userGetEndPoint).permitAll();
-                            auth.requestMatchers(HttpMethod.GET, EndPointService.appointmentGetEndPointAuth).hasAnyAuthority("USER", "DOCTOR");
+                            auth.requestMatchers(HttpMethod.GET, EndPointService.appointmentGetEndPointAuth).hasAnyAuthority("USER", "DOCTOR", "ADMIN");
                             auth.requestMatchers(HttpMethod.POST, EndPointService.appointmentPostEndPointAuth).hasAnyAuthority("USER", "DOCTOR");
                             auth.requestMatchers(HttpMethod.GET, EndPointService.doctorBusyGetEndPointAuth).hasAuthority("DOCTOR");
                             auth.requestMatchers(HttpMethod.POST, EndPointService.doctorBusyPostEndPointAuth).hasAuthority("DOCTOR");

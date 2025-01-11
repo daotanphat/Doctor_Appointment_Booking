@@ -47,6 +47,7 @@ public class EndPointService {
             "/api/v1/appointment/{appointmentId}/details",
             "/api/v1/appointment/payment_info",
             "/api/v1/appointment/doctor-appointments",
+            "/api/v1/appointment/number/{status}",
     };
 
     public static final String[] doctorBusyGetEndPointAuth = {

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -43,4 +44,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
                                       @Param("status") String status,
                                       @Param("dateDesc") boolean dateDesc,
                                       Pageable pageable);
+
+    @Query("SELECT a FROM Appointment a" +
+            " JOIN a.statuses s" +
+            " WHERE (:status IS NULL OR s.status.status = :status)" +
+            " AND (:doctorEmail IS NULL OR a.doctor.email = :doctorEmail)")
+    List<Appointment> findNumberAppointmentByStatus(@Param("doctorEmail") String doctorEmail,
+                                                    @Param("status") String status);
 }

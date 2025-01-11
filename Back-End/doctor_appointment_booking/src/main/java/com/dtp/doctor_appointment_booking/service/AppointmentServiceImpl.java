@@ -162,6 +162,23 @@ public class AppointmentServiceImpl implements AppointmentService {
                 paymentStatus, status, dateDesc, pageable);
     }
 
+    @Override
+    public int numberAppointmentByStatus(User user, String status) {
+        Set<Role> roles = user.getRoles();
+        int num = 0;
+
+        boolean isAdmin = roles.stream().anyMatch(role -> "ADMIN".equalsIgnoreCase(role.getName()));
+        boolean isDoctor = roles.stream().anyMatch(role -> "DOCTOR".equalsIgnoreCase(role.getName()));
+
+        if (isAdmin) {
+            num = appointmentRepository.findNumberAppointmentByStatus(null, status).size();
+        } else if (isDoctor) {
+            num = appointmentRepository.findNumberAppointmentByStatus(user.getEmail(), status).size();
+        }
+
+        return num;
+    }
+
     public AppointmentStatus addAppointmentStatus(String appointmentId, String status) {
         Appointment appointment = appointmentRepository.findByAppointment_id(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException(Appointment.class));

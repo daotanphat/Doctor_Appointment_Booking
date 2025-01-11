@@ -9,23 +9,29 @@ import com.dtp.doctor_appointment_booking.dto.response.PageResponse;
 import com.dtp.doctor_appointment_booking.mapper.AppointmentMapper;
 import com.dtp.doctor_appointment_booking.model.Appointment;
 import com.dtp.doctor_appointment_booking.model.AppointmentStatus;
+import com.dtp.doctor_appointment_booking.model.Role;
+import com.dtp.doctor_appointment_booking.model.User;
 import com.dtp.doctor_appointment_booking.repository.AppointmentRepository;
 import com.dtp.doctor_appointment_booking.repository.AppointmentStatusRepository;
 import com.dtp.doctor_appointment_booking.security.jwt.JwtUtils;
 import com.dtp.doctor_appointment_booking.service.AppointmentService;
+import com.dtp.doctor_appointment_booking.service.UserService;
 import com.dtp.doctor_appointment_booking.service.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/appointment")
 public class AppointmentController {
     private final AppointmentService appointmentService;
@@ -33,16 +39,7 @@ public class AppointmentController {
     private final AppointmentStatusRepository appointmentStatusRepository;
     private final AppointmentMapper appointmentMapper;
     private final VnPayService vnPayService;
-
-    public AppointmentController(AppointmentService appointmentService, JwtUtils jwtUtils,
-                                 AppointmentStatusRepository appointmentStatusRepository,
-                                 AppointmentMapper appointmentMapper, VnPayService vnPayService) {
-        this.appointmentService = appointmentService;
-        this.jwtUtils = jwtUtils;
-        this.appointmentStatusRepository = appointmentStatusRepository;
-        this.appointmentMapper = appointmentMapper;
-        this.vnPayService = vnPayService;
-    }
+    private final UserService userService;
 
     @PostMapping("/book")
     public ResponseEntity<?> bookAppointment(@Valid @RequestBody BookAppointmentRequest request) {
@@ -138,5 +135,17 @@ public class AppointmentController {
         PageResponse<AppointmentResponse> response = new PageResponse<>(appointmentResponses, totalPages);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/number/{status}")
+    public ResponseEntity<Integer> getNumberAppointmentByStatus(@RequestHeader("Authorization") String token,
+                                                                @PathVariable String status) {
+        token = token.replace("Bearer ", "");
+        String email = jwtUtils.getUserNameFromJwtToken(token);
+
+        User user = userService.getUserInfo(email);
+        int num = appointmentService.numberAppointmentByStatus(user, status);
+
+        return ResponseEntity.ok(num);
     }
 }
