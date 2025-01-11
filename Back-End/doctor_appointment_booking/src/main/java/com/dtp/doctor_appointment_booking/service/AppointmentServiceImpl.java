@@ -59,7 +59,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         // check valid slot
         if (!TimeSlotUtils.isTimeSlotAvailable(doctorBusyRepository, timeSlotRepository, request.getDoctor_id(),
                 request.getDateSlot(), request.getTimeSlotFrom(), request.getTimeSlotTo())) {
-            throw new SlotUnavailableException("Slot not available");
+            throw new SlotUnavailableException("Slot is unavailable!");
         }
 
         Doctor doctor = doctorRepository.findByDoctor_id(request.getDoctor_id())
@@ -79,6 +79,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         // update doctor to be occupied
         doctorBusyService.saveDoctorBusy(appointment, "OCCUPIED");
+        List<DoctorBusy> doctorBusies = doctorBusyRepository.findBusyTimeConflict(doctor.getId(),
+                appointment.getDateSlot(),
+                appointment.getTimeSlotFrom().getTime(),
+                appointment.getTimeSlotTo().getTime());
+        if (doctorBusies != null && !doctorBusies.isEmpty()) {
+            throw new SlotUnavailableException("Slot is unavailable!");
+        }
 
         // Schedule delete appointment job
         schedule.ScheduleDeleteAppointmentJob(appointment.getAppointment_id());
